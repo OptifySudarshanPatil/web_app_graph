@@ -1,0 +1,89 @@
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title index
+    script(src="https://cdn.jsdelivr.net/npm/chart.js")
+    style.
+      body {
+        text-align: center;
+      }
+      h {
+        font-weight: bold;
+      }
+  body 
+    h Welcome #{userInput || ''}
+
+    // Add a text box (input field)
+    form(action="/", method="post")
+      label(for="textbox") Enter Text:
+      input(type="text", id="textbox", name="userInput")
+      button(type="submit") Submit
+    
+    div(id="timestamp")
+    
+    canvas(id="myChart"  height="50")
+    
+    script.
+      // Sample Chart.js configuration
+      const ctx = document.getElementById('myChart').getContext('2d');
+      let myChart;
+
+      function getRandomData() {
+        return Array.from({ length: 6 }, () => Math.floor(Math.random() * 30));
+      }
+
+      // Define the updateChart function
+      function updateChart() {
+        const newDataPoint = Math.floor(Math.random() * 30);
+        const newTimestamp = new Date().toLocaleTimeString();
+        
+        // Add new data point and timestamp
+        myChart.data.labels.push(newTimestamp);
+        myChart.data.datasets[0].data.push(newDataPoint);
+
+        // Limit the number of data points to, for example, 10
+        const maxDataPoints = 10;
+        if (myChart.data.labels.length > maxDataPoints) {
+          myChart.data.labels.shift();
+          myChart.data.datasets[0].data.shift();
+        }
+
+        myChart.update();
+      }
+
+      // Create the Chart instance
+      myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],  // Start with an empty array for time-based labels
+          datasets: [{
+            label: '# of Votes',
+            data: [],  // Start with an empty array for random data
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1,
+            fill: false  // Set to false to show only the line, not the area underneath
+          }]
+        },
+        options: {
+          scales: {
+            x: [{
+              type: 'linear',  // Use a linear scale for the x-axis
+              position: 'bottom'
+            }],
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+
+      // Set interval for calling the updateChart function
+      setInterval(updateChart, 500);
+
+      setInterval(() => {
+        const timestampElement = document.getElementById('timestamp');
+        const timestamp = new Date().toLocaleTimeString();
+        timestampElement.textContent = ` ${timestamp}`;
+      }, 1000);
